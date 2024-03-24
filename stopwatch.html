@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stopwatch</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+    }
+    #stopwatch {
+        font-size: 2em;
+        margin-bottom: 20px;
+    }
+    #lap-times {
+        font-size: 1.2em;
+    }
+</style>
+</head>
+<body>
+<h1>Stopwatch</h1>
+<div id="stopwatch">00:00:00</div>
+<button onclick="startStop()">Start</button>
+<button onclick="recordLap()">Lap</button>
+<button onclick="resetStopwatch()">Reset</button>
+<div id="lap-times"></div>
+<script>
+    let stopwatchInterval;
+    let startTime;
+    let elapsedTime = 0;
+    let laps = [];
+    function startStop() {
+        if (!stopwatchInterval) {
+            startTime = Date.now() - elapsedTime;
+            stopwatchInterval = setInterval(updateStopwatch, 10);
+            document.querySelector('button:nth-of-type(1)').innerText = 'Stop';
+        } else {
+            clearInterval(stopwatchInterval);
+            stopwatchInterval = null;
+            document.querySelector('button:nth-of-type(1)').innerText = 'Start';
+        }
+    }
+    function updateStopwatch() {
+        const currentTime = Date.now();
+        elapsedTime = currentTime - startTime;
+        displayTime(elapsedTime);
+    }
+    function displayTime(time) {
+        const minutes = Math.floor(time / 60000);
+        const seconds = Math.floor((time % 60000) / 1000);
+        const milliseconds = Math.floor((time % 1000) / 10);
+        document.getElementById('stopwatch').innerText = 
+            `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}:${String(milliseconds).padStart(2, '0')}`;
+    }
+    function recordLap() {
+        if (stopwatchInterval) {
+            laps.push(elapsedTime);
+            const lapList = document.getElementById('lap-times');
+            const lapItem = document.createElement('div');
+            lapItem.innerText = `Lap ${laps.length}: ${formatTime(elapsedTime)}`;
+            lapList.appendChild(lapItem);
+        }
+    }
+    function formatTime(time) {
+        const minutes = Math.floor(time / 60000);
+        const seconds = Math.floor((time % 60000) / 1000);
+        const milliseconds = Math.floor((time % 1000) / 10);
+        return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}:${String(milliseconds).padStart(2, '0')}`;
+    }
+    function resetStopwatch() {
+        clearInterval(stopwatchInterval);
+        stopwatchInterval = null;
+        elapsedTime = 0;
+        laps = [];
+        displayTime(0);
+        document.getElementById('lap-times').innerHTML = '';
+        document.querySelector('button:nth-of-type(1)').innerText = 'Start';
+    }
+</script>
+</body>
+</html>
